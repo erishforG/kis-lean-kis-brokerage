@@ -25,25 +25,28 @@ public sealed record KisKrOAuthConfig(
     string ProductCode)
 {
     /// <summary>
-    /// Builds config from process environment variables. Mirrors the KIS_PAPER_* variable
-    /// names used by the reference Node implementation (kis/.env.kis) so an operator can wire
-    /// the same values in without this repo ever reading or copying that file's contents.
-    ///
-    /// <c>KIS_PAPER_BASE_URL</c> defaults to KIS's publicly documented paper-trading host —
-    /// this is a fixed API endpoint, not a secret. App key/secret/account values have no
-    /// default and must be provided by the caller's environment.
+    /// Builds config from process environment variables. Generic KIS_* names are preferred;
+    /// KIS_PAPER_* names remain supported for compatibility with the reference Node setup.
     /// </summary>
     public static KisKrOAuthConfig FromEnvironment()
     {
         static string Get(string name, string fallback = "") =>
             Environment.GetEnvironmentVariable(name) ?? fallback;
 
+        var mode = Get("KIS_ACCOUNT_MODE", "paper").Trim().ToLowerInvariant();
+        var isPaper = mode is "paper" or "mock" or "모의";
+        var prefix = isPaper ? "KIS_PAPER_" : "KIS_REAL_";
+        static string First(string primary, string fallback) =>
+            string.IsNullOrWhiteSpace(primary) ? fallback : primary;
+
         return new KisKrOAuthConfig(
-            BaseUrl: Get("KIS_PAPER_BASE_URL", "https://openapivts.koreainvestment.com:29443"),
-            AppKey: Get("KIS_PAPER_APP_KEY"),
-            AppSecret: Get("KIS_PAPER_APP_SECRET"),
-            AccountNo: Get("KIS_PAPER_ACCT_NO"),
-            ProductCode: Get("KIS_PAPER_PROD_CODE"));
+            BaseUrl: First(Get("KIS_BASE_URL"), Get(prefix + "BASE_URL", isPaper
+                ? "https://openapivts.koreainvestment.com:29443"
+                : "https://openapi.koreainvestment.com:9443")),
+            AppKey: First(Get("KIS_APP_KEY"), Get(prefix + "APP_KEY")),
+            AppSecret: First(Get("KIS_APP_SECRET"), Get(prefix + "APP_SECRET")),
+            AccountNo: First(Get("KIS_ACCT_NO"), Get(prefix + "ACCT_NO")),
+            ProductCode: First(Get("KIS_PROD_CODE"), Get(prefix + "PROD_CODE")));
     }
 }
 
@@ -158,8 +161,8 @@ public sealed class KisKrOAuthClient : IDisposable
         if (string.IsNullOrWhiteSpace(_config.AppKey) || string.IsNullOrWhiteSpace(_config.AppSecret))
         {
             throw new InvalidOperationException(
-                "KIS app key/secret missing — set KIS_PAPER_APP_KEY / KIS_PAPER_APP_SECRET " +
-                "(paper account only; never a live/pension account here).");
+                "KIS app key/secret missing — set KIS_APP_KEY / KIS_APP_SECRET " +
+                "or the mode-specific KIS_PAPER_* / KIS_REAL_* variables.");
         }
 
         var requestBody = new

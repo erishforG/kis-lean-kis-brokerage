@@ -255,8 +255,8 @@ internal sealed record KisOverseasDailyPriceResponse(
 
 /// <summary>
 /// KIS US-market (해외주식, NASDAQ/NYSE/AMEX) trading client — limit order placement,
-/// order status/fill query, and balance/holdings query. Paper-account ("모의투자") oriented
-/// only, same env-var configuration pattern as <see cref="KisKrTradingClient"/> — and in fact
+/// order status/fill query, and balance/holdings query. Supports both paper and real-account
+/// routing, using the same configuration pattern as <see cref="KisKrTradingClient"/> — and in fact
 /// the *same* <see cref="KisKrOAuthConfig"/>/<see cref="KisKrOAuthClient"/>, since KIS scopes
 /// app key/secret/tokens to an account, not a market (see the file-level NOTE above).
 ///

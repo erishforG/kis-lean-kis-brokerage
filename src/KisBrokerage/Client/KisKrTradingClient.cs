@@ -221,7 +221,7 @@ internal sealed record KisDailyPriceResponse(
 
 /// <summary>
 /// KIS KR-market trading client — limit order placement, order status/fill query, and
-/// balance/holdings query. Paper-account ("모의투자") oriented only, same env-var
+/// balance/holdings query. Supports both paper and real-account routing, using the same
 /// configuration pattern as <see cref="KisKrOAuthClient"/> (no hardcoded secrets, never
 /// reads kis/.env.kis).
 ///

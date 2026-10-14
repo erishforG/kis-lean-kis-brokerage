@@ -13,9 +13,9 @@ namespace QuantConnect.KisBrokerage.Client;
 /// Open API. Values must be supplied via environment variables (or an equivalent external
 /// config source) — never hardcode real app key/secret/account values in source.
 ///
-/// This PoC targets the KIS paper-trading ("모의투자") environment only. <see cref="AccountNo"/>
-/// and <see cref="ProductCode"/> are not needed for OAuth token issuance itself, but are
-/// included here as placeholders for the balance/order rounds that follow this one.
+/// The same configuration shape is used for KIS paper and real-account environments.
+/// <see cref="AccountNo"/> and <see cref="ProductCode"/> are not needed for OAuth token
+/// issuance itself, but are required by the balance/order calls that follow.
 /// </summary>
 public sealed record KisKrOAuthConfig(
     string BaseUrl,

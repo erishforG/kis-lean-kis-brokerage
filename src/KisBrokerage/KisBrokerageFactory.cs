@@ -40,11 +40,12 @@ public sealed class KisBrokerageFactory : BrokerageFactory
     /// </summary>
     public override Dictionary<string, string> BrokerageData => new()
     {
-        { "kis-paper-app-key", Config.Get("kis-paper-app-key", "") },
-        { "kis-paper-app-secret", Config.Get("kis-paper-app-secret", "") },
-        { "kis-paper-acct-no", Config.Get("kis-paper-acct-no", "") },
-        { "kis-paper-prod-code", Config.Get("kis-paper-prod-code", "") },
-        { "kis-paper-base-url", Config.Get("kis-paper-base-url", "https://openapivts.koreainvestment.com:29443") },
+        { "kis-account-mode", Config.Get("kis-account-mode", "paper") },
+        { "kis-app-key", Config.Get("kis-app-key", "") },
+        { "kis-app-secret", Config.Get("kis-app-secret", "") },
+        { "kis-acct-no", Config.Get("kis-acct-no", "") },
+        { "kis-prod-code", Config.Get("kis-prod-code", "") },
+        { "kis-base-url", Config.Get("kis-base-url", "") },
         { "kis-market-scope", Config.Get("kis-market-scope", "Both") },
     };
 
@@ -52,26 +53,18 @@ public sealed class KisBrokerageFactory : BrokerageFactory
     /// Uses a cash brokerage model with a zero-fee smoke-test model. LEAN's generic default
     /// selects InteractiveBrokersFeeModel for equities, which throws for Market.KRX before the
     /// algorithm can receive data. Real KIS commissions and Korean transaction taxes remain a
-    /// production follow-up; zero fees are intentionally limited to this paper-test adapter.
+    /// follow-up and are not modeled by this adapter.
     /// </summary>
     public override IBrokerageModel GetBrokerageModel(IOrderProvider orderProvider) =>
         new KisBrokerageModel();
 
     public override IBrokerage CreateBrokerage(LiveNodePacket job, IAlgorithm algorithm)
     {
-        var config = new KisKrOAuthConfig(
-            BaseUrl: Config.Get("kis-paper-base-url", "https://openapivts.koreainvestment.com:29443"),
-            AppKey: Config.Get("kis-paper-app-key", ""),
-            AppSecret: Config.Get("kis-paper-app-secret", ""),
-            AccountNo: Config.Get("kis-paper-acct-no", ""),
-            ProductCode: Config.Get("kis-paper-prod-code", ""));
-
-        // isPaper: true is hardcoded — this repo/PoC is paper-account only by design (see
-        // KisKrOAuthConfig's doc comment and the repo-wide "never a live/pension account" rule).
+        var settings = KisRuntimeSettings.FromLeanConfig();
         var brokerage = new KisBrokerage(
-            config,
-            isPaper: true,
-            marketScope: KisMarketScopes.Parse(Config.Get("kis-market-scope", "Both")));
+            settings.Credentials,
+            isPaper: settings.IsPaper,
+            marketScope: settings.MarketScope);
         var fillPollSeconds = Math.Clamp(Config.GetInt("kis-fill-poll-interval-seconds", 30), 15, 120);
         brokerage.EnableFillPolling(TimeSpan.FromSeconds(fillPollSeconds));
         KisBrokerageRuntimeRegistry.RegisterTradingBrokerage(brokerage);

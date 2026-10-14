@@ -8,7 +8,7 @@ strategy, account configuration, OpenClaw automation, credentials, or personal o
 
 ## Scope
 
-- KIS OAuth token caching and paper-account authentication
+- KIS OAuth token caching and configurable paper/real-account authentication
 - LEAN `BrokerageFactory` integration
 - US/overseas and KRX equity balances, holdings, open orders, fills, and daily history
 - Limit-order submission, modification, cancellation, and fill synchronization
@@ -16,14 +16,15 @@ strategy, account configuration, OpenClaw automation, credentials, or personal o
 - Shared KIS rate limiting and bounded request/reconciliation retries
 - Unit tests using fake HTTP responses; no brokerage credentials are required
 
-Market orders are intentionally unsupported. The adapter is paper-trading oriented and should
-be validated against a KIS paper account before any live-account use.
+Market orders are intentionally unsupported. The launcher defaults to the KIS paper endpoint;
+set `kis-account-mode` to `real` and provide the real-account credentials/base URL to select
+KIS's real-account TR IDs. Validate independently before any live use.
 
 ## Requirements
 
 - .NET 10 SDK
 - QuantConnect LEAN 2.5-compatible packages
-- KIS Open API paper-account credentials
+- KIS Open API credentials for the selected account mode
 
 ## Build and test
 
@@ -34,7 +35,8 @@ dotnet build src/KisBrokerage/QuantConnect.KisBrokerage.csproj -c Release
 
 The plugin is loaded by the LEAN Launcher as `QuantConnect.KisBrokerage.KisBrokerageFactory`.
 See [`src/KisBrokerage/config.json`](src/KisBrokerage/config.json) for a credential-free sample.
-Credentials must be supplied through the operator's private runtime configuration; never commit
+Set `kis-account-mode` to `paper` (default) or `real`. Credentials must be supplied through the
+operator's private runtime configuration; never commit
 app keys, app secrets, account numbers, access tokens, journals, or runtime binaries.
 
 ## Safety and limitations
@@ -46,9 +48,8 @@ live use. KIS API limits, endpoint behavior, market rules, and applicable laws o
 change.
 
 The quote feed is REST polling, not a tick-accurate websocket feed. Fees and taxes are not
-modeled by the paper brokerage model.
+modeled by the brokerage model.
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-

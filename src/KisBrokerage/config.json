@@ -1,10 +1,18 @@
 {
-  "// README": "Best-effort LEAN Launcher config for KisBrokerage. The 'kis-paper-*' keys below are read by KisBrokerageFactory via QuantConnect.Configuration.Config.Get(...). These same paper-account keys are also used for US (overseas) trading — KIS scopes app key/secret/account to an account, not a market, so there are no separate 'kis-us-*' keys to configure.",
+  "// README": "LEAN Launcher config for KisBrokerage. Set kis-account-mode to paper (default) or real. Generic kis-* credentials take precedence; kis-paper-* and kis-real-* are supported as scoped fallbacks. Never commit credentials.",
 
   "// data-queue-handler": "This now genuinely works, verified against a real source-built LEAN Launcher: KisBrokerage implements IDataQueueHandler itself (see KisBrokerage.DataQueueHandler.cs) via a self-hosted REST-polling loop against the real KIS current-price/quote endpoints (KR: inquire-price; US: overseas-price/quotations/price) — NOT a websocket/real-time feed. Expect ~kis-quote-poll-interval-seconds (default 5s) of lag per symbol, not tick-accurate data. See KisBrokerage.DataQueueHandler.cs's doc comment for the full scope note and README.md's 'What's real vs. stubbed' section.",
   "kis-quote-poll-interval-seconds": 5,
 
   "environment": "live-kis",
+
+  "kis-account-mode": "paper",
+
+  "kis-app-key": "",
+  "kis-app-secret": "",
+  "kis-acct-no": "",
+  "kis-prod-code": "",
+  "kis-base-url": "",
 
   "algorithm-type-name": "BasicTemplateAlgorithm",
   "algorithm-language": "CSharp",

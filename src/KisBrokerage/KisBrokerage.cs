@@ -20,7 +20,7 @@ namespace QuantConnect.KisBrokerage;
 ///
 /// Both <see cref="Market.KRX"/> and <see cref="Market.USA"/> orders are wired to real KIS
 /// clients now (<see cref="KisKrTradingClient"/> / <see cref="KisUsTradingClient"/>,
-/// paper-account "모의투자" only). Both share the same <see cref="KisKrOAuthClient"/>/
+/// with paper and real-account routing selected by runtime configuration. Both share the same <see cref="KisKrOAuthClient"/>/
 /// <see cref="KisKrOAuthConfig"/> instance — KIS scopes OAuth tokens/app keys to an account,
 /// not a market, so there is no separate "US OAuth client" (see KisUsTradingClient.cs's
 /// file-level NOTE for the reference-code evidence).
@@ -107,21 +107,19 @@ public sealed partial class KisBrokerage : Brokerage, IDataQueueHandler, IKisBro
     /// IDataQueueHandler&gt;("QuantConnect.KisBrokerage.KisBrokerage")</c> can construct this
     /// class via reflection when config.json's <c>data-queue-handler</c> points at this same
     /// type name (see the class doc comment's "IMPORTANT" note). Reads the same
-    /// <c>kis-paper-*</c> LEAN config keys as <see cref="KisBrokerageFactory.CreateBrokerage"/>
-    /// — paper account only, same as everywhere else in this repo.
+    /// the same account-mode and credential keys as <see cref="KisBrokerageFactory.CreateBrokerage"/>.
     /// </summary>
     public KisBrokerage()
-        : this(
-            new KisKrOAuthConfig(
-                BaseUrl: Config.Get("kis-paper-base-url", "https://openapivts.koreainvestment.com:29443"),
-                AppKey: Config.Get("kis-paper-app-key", ""),
-                AppSecret: Config.Get("kis-paper-app-secret", ""),
-                AccountNo: Config.Get("kis-paper-acct-no", ""),
-                ProductCode: Config.Get("kis-paper-prod-code", "")),
-            isPaper: true,
-            marketScope: KisMarketScopes.Parse(Config.Get("kis-market-scope", "Both")))
+        : this(CreateRuntimeSettings())
     {
     }
+
+    private KisBrokerage(KisRuntimeSettings settings)
+        : this(settings.Credentials, settings.IsPaper, settings.MarketScope)
+    {
+    }
+
+    private static KisRuntimeSettings CreateRuntimeSettings() => KisRuntimeSettings.FromLeanConfig();
 
     public KisBrokerage(
         KisKrOAuthConfig config,

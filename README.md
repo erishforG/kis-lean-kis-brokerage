@@ -39,6 +39,22 @@ Set `kis-account-mode` to `paper` (default) or `real`. Credentials must be suppl
 operator's private runtime configuration; never commit
 app keys, app secrets, account numbers, access tokens, journals, or runtime binaries.
 
+For a real account, the minimal launcher settings are:
+
+```json
+{
+  "kis-account-mode": "real",
+  "kis-app-key": "<real-account-app-key>",
+  "kis-app-secret": "<real-account-app-secret>",
+  "kis-acct-no": "<account-number>",
+  "kis-prod-code": "<product-code>",
+  "kis-base-url": "https://openapi.koreainvestment.com:9443"
+}
+```
+
+The default remains paper mode. Switching to `real` selects KIS real-account transaction IDs;
+test the complete order lifecycle with a controlled account before unattended operation.
+
 ## Safety and limitations
 
 This software sends brokerage requests and can lose money if misconfigured. It is provided for

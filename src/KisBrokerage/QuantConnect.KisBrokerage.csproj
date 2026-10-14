@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!--
+      Class library, not an Exe: LEAN's Launcher loads brokerage plugins as assemblies via
+      reflection (see KisBrokerageFactory + config.json's "brokerage-factory"/"data-queue-handler"
+      keys), it does not run this project directly.
+    -->
+    <OutputType>Library</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>QuantConnect.KisBrokerage</RootNamespace>
+    <AssemblyName>QuantConnect.KisBrokerage</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="QuantConnect.Brokerages" Version="2.5.*" />
+    <PackageReference Include="QuantConnect.Configuration" Version="2.5.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- LEAN launcher config for this plugin; not compiled, just carried alongside the DLL. -->
+    <None Include="config.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="QuantConnect.KisBrokerage.Tests" />
+  </ItemGroup>
+</Project>

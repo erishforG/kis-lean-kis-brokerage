@@ -1,0 +1,38 @@
+{
+  "// README": "Best-effort LEAN Launcher config for KisBrokerage. The 'kis-paper-*' keys below are read by KisBrokerageFactory via QuantConnect.Configuration.Config.Get(...). These same paper-account keys are also used for US (overseas) trading — KIS scopes app key/secret/account to an account, not a market, so there are no separate 'kis-us-*' keys to configure.",
+
+  "// data-queue-handler": "This now genuinely works, verified against a real source-built LEAN Launcher: KisBrokerage implements IDataQueueHandler itself (see KisBrokerage.DataQueueHandler.cs) via a self-hosted REST-polling loop against the real KIS current-price/quote endpoints (KR: inquire-price; US: overseas-price/quotations/price) — NOT a websocket/real-time feed. Expect ~kis-quote-poll-interval-seconds (default 5s) of lag per symbol, not tick-accurate data. See KisBrokerage.DataQueueHandler.cs's doc comment for the full scope note and README.md's 'What's real vs. stubbed' section.",
+  "kis-quote-poll-interval-seconds": 5,
+
+  "environment": "live-kis",
+
+  "algorithm-type-name": "BasicTemplateAlgorithm",
+  "algorithm-language": "CSharp",
+  "algorithm-location": "QuantConnect.Algorithm.CSharp.dll",
+
+  "data-folder": "../../../Data/",
+
+  "kis-paper-app-key": "",
+  "kis-paper-app-secret": "",
+  "kis-paper-acct-no": "",
+  "kis-paper-prod-code": "",
+  "kis-paper-base-url": "https://openapivts.koreainvestment.com:29443",
+  "kis-market-scope": "Both",
+
+  "environments": {
+    "live-kis": {
+      "live-mode": true,
+
+      "setup-handler": "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler",
+      "result-handler": "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler",
+      "data-feed-handler": "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed",
+      "real-time-handler": "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler",
+      "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler",
+
+      "history-provider": [ "BrokerageHistoryProvider", "SubscriptionDataReaderHistoryProvider" ],
+
+      "live-mode-brokerage": "KisBrokerage",
+      "data-queue-handler": [ "QuantConnect.KisBrokerage.KisBrokerage" ]
+    }
+  }
+}

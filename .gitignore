@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+.DS_Store
+*.user
+*.suo
+*.token_cache_*.json
+runtime/
+secrets/
+logs/
+

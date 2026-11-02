@@ -3,6 +3,8 @@
 An open-source QuantConnect LEAN brokerage adapter for Korea Investment & Securities (KIS),
 with support for KIS overseas stock trading (including US equities) and Korean equities.
 
+> **Status**: Verified on KIS Paper Trading only. Real-account testing is WIP (PRs and feedback welcome).
+
 This repository contains only the broker integration layer. It does not include a trading
 strategy, account configuration, OpenClaw automation, credentials, or personal operating data.
 
